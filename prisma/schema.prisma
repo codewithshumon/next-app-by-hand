@@ -15,6 +15,7 @@ model User {
   name      String
   password  String
   profile   Profile?
+  posts     Post[]
   roles     UserRole[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
@@ -35,6 +36,19 @@ model Role {
   id   String     @id @default(cuid())
   name String     @unique
   users UserRole[]
+}
+
+// ─── 1:M Relationship: User → Posts ───
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model UserRole {
