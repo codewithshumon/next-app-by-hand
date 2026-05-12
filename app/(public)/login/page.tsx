@@ -32,7 +32,7 @@ export default function LoginPage() {
       }
 
       setUser(data.user);
-      router.push(data.user.roles.includes("admin") ? "/admin" : "/");
+      router.push(data.user.roles.includes("admin") ? "/admin" : "/customer");
     } catch {
       setError("Something went wrong");
     } finally {

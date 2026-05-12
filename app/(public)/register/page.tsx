@@ -33,7 +33,7 @@ export default function RegisterPage() {
       }
 
       setUser(data.user);
-      router.push("/");
+      router.push(data.user.roles.includes("admin") ? "/admin" : "/customer");
     } catch {
       setError("Something went wrong");
     } finally {

@@ -29,7 +29,7 @@ export async function proxy(request: NextRequest) {
   const publicPaths = ["/login", "/register", "/api/auth/login", "/api/auth/register"];
   if (publicPaths.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
     if (token && (pathname === "/login" || pathname === "/register")) {
-      const dest = token.roles.includes("admin") ? "/admin" : "/";
+      const dest = token.roles.includes("admin") ? "/admin" : "/customer";
       return NextResponse.redirect(new URL(dest, request.url));
     }
     return NextResponse.next();
@@ -54,9 +54,19 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Protected customer routes
-  const protectedPaths = ["/profile"];
-  if (protectedPaths.some((p) => pathname.startsWith(p))) {
+  // Customer routes - require customer role
+  if (pathname.startsWith("/customer")) {
+    if (!token) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+    if (!token.roles.includes("customer")) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  // Protected user routes (profile etc.)
+  if (pathname.startsWith("/profile")) {
     if (!token) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
