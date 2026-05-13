@@ -1,19 +1,16 @@
-import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
-// ISR: revalidate every 60 seconds instead of rebuilding the whole page
-export const revalidate = 60;
+const REVALIDATE_SECONDS = 60;
 
 export default async function BlogPage() {
-  let posts: Awaited<ReturnType<typeof prisma.post.findMany<{ include: { author: { select: { name: true } } } }>>> = [];
+  let posts: { id: string; title: string; content: string | null; createdAt: string; author: { name: string } }[] = [];
   try {
-    posts = await prisma.post.findMany({
-      where: { published: true },
-      include: { author: { select: { name: true } } },
-      orderBy: { createdAt: "desc" },
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/posts`, {
+      next: { revalidate: REVALIDATE_SECONDS },
     });
+    if (res.ok) posts = await res.json();
   } catch {
-    // DB unavailable at build time — ISR will regenerate at runtime
+    // API unavailable at build time — ISR will regenerate at runtime
   }
 
   return (
@@ -43,7 +40,7 @@ export default async function BlogPage() {
       )}
 
       <p className="mt-10 text-xs text-gray-400">
-        ISR &middot; revalidate = {revalidate}s
+        ISR &middot; revalidate = {REVALIDATE_SECONDS}s
       </p>
     </div>
   );

@@ -1,18 +1,16 @@
-import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-// ISR: revalidate individual post pages every 60 seconds
-export const revalidate = 60;
+const REVALIDATE_SECONDS = 60;
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-// Pre-generate pages for all published posts at build time
-// Falls back to empty array if DB is unavailable (pages generated on-demand via ISR)
 export async function generateStaticParams() {
   try {
-    const posts = await prisma.post.findMany({
-      where: { published: true },
-      select: { id: true },
+    const res = await fetch(`${BASE_URL}/api/posts`, {
+      next: { revalidate: REVALIDATE_SECONDS },
     });
+    if (!res.ok) return [];
+    const posts: { id: string }[] = await res.json();
     return posts.map((p) => ({ id: p.id }));
   } catch {
     return [];
@@ -21,10 +19,16 @@ export async function generateStaticParams() {
 
 export default async function BlogPostPage(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params;
-  const post = await prisma.post.findUnique({
-    where: { id },
-    include: { author: { select: { name: true } } },
-  });
+
+  let post: { id: string; title: string; content: string | null; published: boolean; createdAt: string; author: { name: string } } | null = null;
+  try {
+    const res = await fetch(`${BASE_URL}/api/posts/${id}`, {
+      next: { revalidate: REVALIDATE_SECONDS },
+    });
+    if (res.ok) post = await res.json();
+  } catch {
+    // API unavailable — ISR will retry
+  }
 
   if (!post || !post.published) notFound();
 
@@ -47,7 +51,7 @@ export default async function BlogPostPage(props: { params: Promise<{ id: string
       </article>
 
       <p className="mt-10 text-xs text-gray-400">
-        ISR &middot; revalidate = {revalidate}s &middot; generateStaticParams
+        ISR &middot; revalidate = {REVALIDATE_SECONDS}s &middot; generateStaticParams
       </p>
     </div>
   );
