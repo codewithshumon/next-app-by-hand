@@ -4,7 +4,7 @@ services:
     container_name: nextapp_postgres
     restart: unless-stopped
     ports:
-      - "5433:5432"
+      - "5033:5432"
     environment:
       POSTGRES_USER: nextapp
       POSTGRES_PASSWORD: nextapp_secret

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /home/shumon/Music/next-app-by-hand/app/\\\\\\(public\\\\\\)/blog/\\\\[id\\\\])",
+      "Bash(mkdir -p /home/shumon/Music/next-app-by-hand/app/customer/posts/\\\\[id\\\\]/edit && mkdir -p /home/shumon/Music/next-app-by-hand/app/customer/posts/new)",
+      "Bash(npx next *)",
+      "Bash(pnpm build *)"
+    ],
+    "additionalDirectories": [
+      "/home/shumon/Music/next-app-by-hand/app/(public)/blog",
+      "/home/shumon/Music/next-app-by-hand/app/customer/posts/[id]"
+    ]
+  }
+}

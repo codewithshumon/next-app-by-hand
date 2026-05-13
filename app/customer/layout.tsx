@@ -2,6 +2,7 @@ import Link from "next/link";
 
 const navLinks = [
   { href: "/customer", label: "Dashboard" },
+  { href: "/customer/posts", label: "My Posts" },
 ];
 
 export default function CustomerLayout({ children }: { children: React.ReactNode }) {

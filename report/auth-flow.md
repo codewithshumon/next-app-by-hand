@@ -90,19 +90,27 @@ Browser                           Server
 
 ---
 
-## 4. Logout — Token Destruction
+## 4. Logout — Token Destruction + Redirect
 
 **Endpoint:** `POST /api/auth/logout`
 
+There are two logout triggers in the app:
+
+### A. Admin / Customer Layouts — Form POST
+
+The admin and customer layouts use a plain `<form>` that POSTs directly to `/api/auth/logout`. The server handles everything:
+
 **Flow:**
-1. Server responds with an expired cookie to overwrite the existing one:
+1. Form submits `POST /api/auth/logout`
+2. Server responds with `302` redirect to `/` + clears the cookie:
 
 ```
+HTTP/1.1 302 Found
+Location: /
 Set-Cookie: token=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax
 ```
 
-2. `Max-Age=0` tells the browser to delete the cookie immediately
-3. Zustand state is cleared on the client side via `logout()`
+3. Browser deletes the cookie and navigates to `/`
 
 ```
 Browser                           Server
@@ -111,12 +119,34 @@ Browser                           Server
   │  Cookie: token=<jwt>            │
   │ ──────────────────────────────→ │
   │                                 │
+  │  302 Found                      │
+  │  Location: /                    │
   │  Set-Cookie: token=; Max-Age=0  │
   │ ←────────────────────────────── │
   │                                 │
   │  Cookie deleted by browser      │
-  │  Zustand: logout() → cleared    │
+  │  Redirect to /                  │
 ```
+
+### B. Public Layout — Zustand `logout()`
+
+The public layout uses a `<button>` that calls `useAuthStore.getState().logout()`:
+
+**Flow:**
+1. Zustand `logout()` fires `POST /api/auth/logout`
+2. Cookie is cleared on the server
+3. Zustand clears user state (`set({ user: null, isAuthenticated: false })`)
+4. `window.location.href = "/"` triggers a full page navigation to `/`
+
+```ts
+logout: async () => {
+  await fetch("/api/auth/logout", { method: "POST" });
+  set({ user: null, isAuthenticated: false });
+  window.location.href = "/";
+},
+```
+
+Both paths end up at the same result: cookie deleted, state cleared, user on `/`.
 
 ---
 

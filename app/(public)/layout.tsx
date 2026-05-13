@@ -18,6 +18,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           <Link href="/" className="text-xl font-bold text-gray-900">
             Store
           </Link>
+          <nav className="flex items-center gap-4">
+            <Link href="/blog" className="text-sm text-gray-600 hover:text-gray-900">Blog</Link>
+          </nav>
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
               <div className="flex items-center gap-3">

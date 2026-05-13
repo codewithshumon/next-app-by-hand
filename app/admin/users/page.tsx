@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import UserActions from "./user-actions";
 
+// SSR: force fresh data on every request
+export const dynamic = "force-dynamic";
+
 export default async function AdminUsersPage() {
   const users = await prisma.user.findMany({
     include: {

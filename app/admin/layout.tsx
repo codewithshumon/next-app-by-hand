@@ -3,6 +3,7 @@ import Link from "next/link";
 const navLinks = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/users", label: "Users" },
+  { href: "/admin/posts", label: "Posts" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
