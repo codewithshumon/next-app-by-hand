@@ -17,8 +17,6 @@ prisma - one to one, one ot many, many to many, solve circular error, n+1 query 
 
 
 
-
-
 Create CRUD with CSR + SSR with SWR + ISR. Including ORM (1:1, 1:M, M:M), + use layout for 2 user way (Admin, customer), use middleware for RBAC. And use user way layout.
 
 ## Rendering Patterns — Applied
